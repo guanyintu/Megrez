@@ -29,9 +29,7 @@ func New(logPath string, minLevel logrus.Level) (FileLogger, error) {
 
 	file, err := os.Create(logPath)
 	log := logrus.New()
-	log.SetFormatter(&logrus.JSONFormatter{
-		DisableHTMLEscape: true, PrettyPrint: true,
-	})
+	log.SetFormatter(&logrus.JSONFormatter{})
 	log.SetLevel(minLevel)
 	writers := []io.Writer{
 		file,
