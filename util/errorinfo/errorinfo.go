@@ -3,6 +3,7 @@ package errorinfo
 import (
 	"github.com/tencent-connect/botgo/dto"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -13,9 +14,9 @@ func SqlError(ID string) *dto.MessageToCreate {
 	rand.Seed(time.Now().Unix())
 	return &dto.MessageToCreate{MsgID: ID, Content: info[rand.Intn(len(info))], Image: pic[rand.Intn(len(pic))]}
 }
-func bingo(ID string) *dto.MessageToCreate {
-	info := []string{"bingo！", "🎉答对啦！"}
+func Bingo(ID string, User string) *dto.MessageToCreate {
+	info := []string{"bingo!{user}答对啦！", "🎉恭喜{user}答对啦！"}
 	pic := []string{""}
 	rand.Seed(time.Now().Unix())
-	return &dto.MessageToCreate{MsgID: ID, Content: info[rand.Intn(len(info))], Image: pic[rand.Intn(len(pic))]}
+	return &dto.MessageToCreate{MsgID: ID, Content: strings.Replace(info[rand.Intn(len(info))], "{user}", "<@"+User+">", -1), Image: pic[rand.Intn(len(pic))]}
 }
