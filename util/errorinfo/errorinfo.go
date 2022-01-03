@@ -20,3 +20,9 @@ func Bingo(ID string, User string) *dto.MessageToCreate {
 	rand.Seed(time.Now().Unix())
 	return &dto.MessageToCreate{MsgID: ID, Content: strings.Replace(info[rand.Intn(len(info))], "{user}", "<@"+User+">", -1), Image: pic[rand.Intn(len(pic))]}
 }
+func OutTime(ID string, User string) *dto.MessageToCreate {
+	info := []string{"抱歉！{user}你超时了！！", "{user}下次答快点哦！", "{user}也许可以实时\"电话微波炉（暂定）\""}
+	pic := []string{""}
+	rand.Seed(time.Now().Unix())
+	return &dto.MessageToCreate{MsgID: ID, Content: strings.Replace(info[rand.Intn(len(info))], "{user}", "<@"+User+">", -1), Image: pic[rand.Intn(len(pic))]}
+}
