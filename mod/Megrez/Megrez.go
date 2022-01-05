@@ -120,6 +120,7 @@ func Megrez(data *dto.WSATMessageData, statu *Statu, config *Config, ctx context
 					for elem := range it.C {
 						statu.Try[elem.(string)] += 1
 					}
+					statu.TryTmp.Clear()
 
 				}
 			}
