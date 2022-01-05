@@ -97,3 +97,14 @@ func (m Mysql) Profile(users []string) ([]User, error) {
 
 	return res, nil
 }
+func (m Mysql) GetProfile(uid string) (User, error) {
+	var res []User
+	err := m.db.Select(&res, "select * from user where id = ?", uid)
+	if err != nil {
+		return User{}, err
+	}
+	if len(res) == 0 {
+		res = append(res, User{Uid: uid, Icon: 0, Admin: 0, Sum: 0, Success: 0})
+	}
+	return res[0], nil
+}

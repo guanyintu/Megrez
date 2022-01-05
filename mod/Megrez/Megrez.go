@@ -159,7 +159,15 @@ func Megrez(data *dto.WSATMessageData, statu *Statu, config *Config, ctx context
 			if err != nil {
 				return err
 			}
-			statu = nil
+
+			statu.Code = 0
+			statu.Answers = ""
+			statu.Try = make(map[string]int)
+			statu.TryTmp = mapset.NewSet()
+			statu.Answer = make(chan string)
+			statu.Stop = make(chan string)
+			statu.Success = make(map[string]int)
+
 		}
 	}
 	return nil

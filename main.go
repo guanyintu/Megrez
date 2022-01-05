@@ -76,11 +76,10 @@ func main() {
 				log.Error(err)
 			}
 		}()
-		_, err := api.PostMessage(ctx, data.ChannelID, &dto.MessageToCreate{MsgID: data.ChannelID, Content: "1\n2"})
+		err := Megrez.Profile(data, status[data.ChannelID], ctx, api)
 		if err != nil {
-			return err
+			log.Error(err)
 		}
-		// 发被动消息到频道
 
 		return nil
 	}

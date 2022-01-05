@@ -77,3 +77,14 @@ func Stop(ID string) *dto.MessageToCreate {
 	rand.Seed(time.Now().Unix())
 	return &dto.MessageToCreate{MsgID: ID, Content: info[rand.Intn(len(info))], Image: pic[rand.Intn(len(pic))]}
 }
+func SendProfile(ID string, uid string, icon int64, success int64, sum int64) *dto.MessageToCreate {
+	var MOS float32
+	if sum == 0 {
+		MOS = 0
+	} else {
+		MOS = float32(success) / float32(sum) * 100
+	}
+
+	res := fmt.Sprintf("个人信息\n<@!%s>\n硬币：%d\n答对：%d\n总答题次数：%d\n正确率：%.2f%%", uid, icon, success, sum, MOS)
+	return &dto.MessageToCreate{MsgID: ID, Content: res}
+}
