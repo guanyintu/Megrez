@@ -3,6 +3,7 @@ package main
 import (
 	"Megrez/mod/Megrez"
 	"Megrez/mod/logger"
+	sql "Megrez/util/mysql"
 	"context"
 	mapset "github.com/deckarep/golang-set"
 	"github.com/tencent-connect/botgo"
@@ -12,13 +13,13 @@ import (
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"os"
-	"strings"
 	"time"
 )
 
 var conf struct {
 	AppID uint64 `yaml:"appid"`
 	Token string `yaml:"token"`
+	Dsn   string `yaml:"dsn"`
 }
 var log, _ = logger.New("./log/main.log", logger.DebugLevel)
 
@@ -37,6 +38,7 @@ func init() {
 		log.Error(err)
 		os.Exit(1)
 	}
+	Megrez.Db, _ = sql.InitMySQL(conf.Dsn)
 	log.Info(conf)
 
 }
@@ -56,23 +58,29 @@ func main() {
 	status = make(map[string]*Megrez.Statu)
 	var configs map[string]*Megrez.Config
 	configs = make(map[string]*Megrez.Config)
+
 	var atMessage websocket.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
 		if status[data.ChannelID] == nil {
 			status[data.ChannelID] = &Megrez.Statu{
-				Code: 0, Answers: "", Try: make(map[string]int), TryTmp: mapset.NewSet(), Answer: make(chan string), Stop: make(chan string),
+				Code: 0, Answers: "", Try: make(map[string]int), TryTmp: mapset.NewSet(), Answer: make(chan string), Stop: make(chan string), Success: make(map[string]int),
 			}
 		}
-		err := Megrez.Megrez(data, status[data.ChannelID], configs[data.ChannelID], ctx, api)
+		if configs[data.ChannelID] == nil {
+			configs[data.ChannelID] = &Megrez.Config{
+				AnswerTime: 15, WaitTime: 5, Turn: 10, Category: make([]string, 0),
+			}
+		}
+		go func() {
+			err := Megrez.Megrez(data, status[data.ChannelID], configs[data.ChannelID], ctx, api)
+			if err != nil {
+				log.Error(err)
+			}
+		}()
+		_, err := api.PostMessage(ctx, data.ChannelID, &dto.MessageToCreate{MsgID: data.ChannelID, Content: "1\n2"})
 		if err != nil {
-			log.Warn(err)
+			return err
 		}
 		// 发被动消息到频道
-		if strings.Contains(data.Content, "/hello") { // 如果at机器人并输入 hello 则回复 Hello World 。需要后台配置语料 否则回复不了
-			_, err := api.PostMessage(ctx, data.ChannelID, &dto.MessageToCreate{MsgID: data.ID, Content: "<@!2099239095634967223> Hello World"})
-			if err != nil {
-				log.Warn(err)
-			}
-		}
 
 		return nil
 	}
